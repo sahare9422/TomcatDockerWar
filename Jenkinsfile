@@ -3,25 +3,32 @@ pipeline {
      stages {
           stage("Compile") {
                steps {
-                    sh "/usr/bin/mvn compile"
+                    withMaven(maven : 'apache-maven-3.6.3'){
+                         sh "mvn clean compile"
+                    }
                }
           }
           stage("Unit test") {
                steps {
-                    sh "/usr/bin/mvn test"
+                    withMaven(maven : 'apache-maven-3.6.3'){
+                         sh "/usr/bin/mvn test"
+                    }
                }
           }
      
     
 stage("Package") {
      steps {
-          sh "/usr/bin/mvn package"
+          withMaven(maven : 'apache-maven-3.6.3'){
+               sh "/usr/bin/mvn package"
+          }
      }
 }
 stage("Docker build") {
      steps {
-      
-          sh "docker build -t deepak_tomcat ."
+           withMaven(maven : 'apache-maven-3.6.3'){
+               sh "docker build -t deepak_tomcat ."
+           }
      }
 }
 
@@ -30,7 +37,7 @@ stage("Deploy to staging") {
           
           sh "docker stop \$(docker ps -qa)"
           sh "docker rm \$(docker ps -qa)"
-          sh "docker run -d -it -v /var/lib/jenkins/workspace/pipelne-with-docker/target/:/usr/local/tomcat/webapps/ -p 8091:8080 --name Testtomcat deepak_tomcat"
+          sh "docker run -d -it -v /var/lib/jenkins/workspace/tomcat-cont/target/:/usr/local/tomcat/webapps/ -p 8091:8080 --name Testtomcat deepak_tomcat"
      }
 }
 
